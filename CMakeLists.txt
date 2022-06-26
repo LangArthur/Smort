@@ -24,6 +24,8 @@ FetchContent_MakeAvailable(glm)
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/movement.cpp
 )
 
 

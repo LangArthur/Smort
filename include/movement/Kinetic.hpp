@@ -10,6 +10,15 @@
 #include <glm/vec3.hpp>
 
 namespace movement {
+
+    /**
+     * @brief structure representing changes to be apply to a Kinetic element.
+     */
+    struct SteeringOutput {
+        glm::vec3 linear; // linear change
+        float angular; // angular change        
+    };
+
     /**
      * @brief structure representing a state of an object.
      */
@@ -26,13 +35,5 @@ namespace movement {
             velocity += steering.linear * time;
             rotation += steering.angular * time;
         }
-    };
-
-    /**
-     * @brief structure representing changes to be apply to a Kinetic element.
-     */
-    struct SteeringOutput {
-        glm::vec3 linear; // linear change
-        float angular; // angular change        
     };
 }

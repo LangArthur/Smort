@@ -13,10 +13,11 @@
 namespace movement {
     SteeringOutput seek(const Kinetic &currentState, const glm::vec3 &target, int maxSpeed = 1) {
         SteeringOutput result;
-        result.linear = target - currentState.position;
+        result.linear = currentState.position - target;
         glm::normalize(result.linear);
         result.linear *= maxSpeed;
         result.angular = newOrientation(currentState.orientation, result.linear);
+        return result;
     }
 
     SteeringOutput flee(const Kinetic &currentState, const glm::vec3 &target, int maxSpeed = 1) {
@@ -25,5 +26,6 @@ namespace movement {
         glm::normalize(result.linear);
         result.linear *= maxSpeed;
         result.angular = newOrientation(currentState.orientation, result.linear);
+        return result;
     }
 }

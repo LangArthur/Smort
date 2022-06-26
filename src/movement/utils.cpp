@@ -9,12 +9,5 @@
 #include <glm/vec3.hpp>
 
 namespace movement
-{
-    inline float newOrientation(float current, const glm::vec3 &velocity) {
-        if (velocity.length)
-            return atan2(-velocity.x, velocity.y);
-        else
-            return current;
-    }
-    
+{    
 } // namespace Movement

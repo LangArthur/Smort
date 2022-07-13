@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 20)
 project(test)
 
 find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
 
 include(FetchContent)
 
@@ -30,12 +31,15 @@ add_executable(${PROJECT_NAME}
 
 
 target_include_directories(${PROJECT_NAME} PRIVATE
+    ${OPENGL_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIRS}
     include/
 )
 
 ## Linking libraries to street
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  ${OPENGL_LIBRARIES}
-  glm::glm
-  glfw
+    ${OPENGL_LIBRARIES}
+    ${GLEW_LIBRARIES}
+    glm::glm
+    glfw
 )

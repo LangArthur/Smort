@@ -1,0 +1,4 @@
+[submodule "GLToolbox"]
+	path = GLToolbox
+	url = https://github.com/LangArthur/GLToolbox.git
+	branch = master

@@ -4,6 +4,7 @@ project(test)
 
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(GLUT REQUIRED)
 
 include(FetchContent)
 
@@ -23,16 +24,18 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glm)
 
+add_subdirectory(GLToolbox)
+
 add_executable(${PROJECT_NAME}
     src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/movement.cpp
 )
 
-
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${OPENGL_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIRS}
+    ${GLUT_INCLUDE_DIRS}
     include/
 )
 
@@ -40,6 +43,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PUBLIC
     ${OPENGL_LIBRARIES}
     ${GLEW_LIBRARIES}
+    ${GLUT_LIBRARIES}
     glm::glm
     glfw
+    glut
+    GLToolBox
 )

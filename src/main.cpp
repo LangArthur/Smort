@@ -12,6 +12,19 @@
 
 #include <glm/vec4.hpp>
 
+#include <shader/Shader.hpp>
+#include <shader/ShaderLinker.hpp>
+
+GLuint setUpShader() {
+    Shader vertexShader (GL_VERTEX_SHADER, "GLToolbox/shaders/SimpleVertexShader.vertexshader");
+    Shader fragmentShader (GL_FRAGMENT_SHADER, "GLToolbox/shaders/SimpleFragmentShader.fragmentshader");
+    ShaderLinker linker({
+        vertexShader,
+        fragmentShader,
+    });
+    return (linker.ready() ? linker.id() : 0);
+}
+
 void instantiateScene() {
     GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -49,6 +62,7 @@ int main(int argc, char const *argv[])
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    GLuint shaderId = setUpShader();
     // instantiateScene();
 
     /* Loop until the user closes the window */

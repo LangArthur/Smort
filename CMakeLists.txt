@@ -37,6 +37,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${GLEW_INCLUDE_DIRS}
     ${GLUT_INCLUDE_DIRS}
     include/
+    GLToolbox/include/
 )
 
 ## Linking libraries to street

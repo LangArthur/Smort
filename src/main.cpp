@@ -15,7 +15,7 @@
 #include <shader/Shader.hpp>
 #include <shader/ShaderLinker.hpp>
 
-constexpr auto WINDOW_HEIGhT = 480;
+constexpr auto WINDOW_HEIGHT = 480;
 constexpr auto WINDOW_WIDTH = 640;
 
 GLuint setUpShader() {
@@ -56,13 +56,13 @@ GLFWwindow* init(int argc, char **argv) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", NULL, NULL);
     if (!window) {
         std::cerr << "Error: cannot instantiate window." << std::endl;
         return nullptr;
     }
 
-    glViewport(0, 0, 800, 600);
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     glfwMakeContextCurrent(window);
     // setup glew
     GLenum err = glewInit();

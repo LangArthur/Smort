@@ -15,9 +15,12 @@
 #include <shader/Shader.hpp>
 #include <shader/ShaderLinker.hpp>
 
+constexpr auto WINDOW_HEIGhT = 480;
+constexpr auto WINDOW_WIDTH = 640;
+
 GLuint setUpShader() {
-    Shader vertexShader (GL_VERTEX_SHADER, "GLToolbox/shaders/SimpleVertexShader.vertexshader");
-    Shader fragmentShader (GL_FRAGMENT_SHADER, "GLToolbox/shaders/SimpleFragmentShader.fragmentshader");
+    Shader vertexShader (GL_VERTEX_SHADER, "../GLToolbox/shaders/SimpleVertexShader.vert");
+    Shader fragmentShader (GL_FRAGMENT_SHADER, "../GLToolbox/shaders/SimpleFragmentShader.frag");
     ShaderLinker linker({
         vertexShader,
         fragmentShader,
@@ -42,28 +45,56 @@ void instantiateScene() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 }
 
-int main(int argc, char const *argv[])
-{
+GLFWwindow* init(int argc, char **argv) {
     GLFWwindow* window;
-    glm::vec4 vec4;
+    // init glfw
+    if (!glfwInit()) {
+        std::cerr << "Failed to instantiate glfw\n";
+        return nullptr;
+    }
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-
-    /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
+    if (!window) {
+        std::cerr << "Error: cannot instantiate window." << std::endl;
+        return nullptr;
     }
 
-    /* Make the window's context current */
+    glViewport(0, 0, 800, 600);
     glfwMakeContextCurrent(window);
+    // setup glew
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        std::cerr << "Cannot init glew library: " << glewGetErrorString(err) << std::endl;
+        return nullptr;
+    }
+    return window;
+    
+}
+
+int clear(int status) {
+    glfwTerminate();
+    return status;
+}
+
+int main(int argc, char *argv[])
+{
+    GLFWwindow* window = init(argc, argv);
+    /* Create a windowed mode window and its OpenGL context */
+    if (!window)
+    {
+        return clear(1);
+    }
+    glm::vec4 vec4;
 
     GLuint shaderId = setUpShader();
-    // instantiateScene();
+    if (shaderId == 0) {
+        std::cerr << "Cannot setup shaders" << std::endl;
+        return clear(1);
+    }
+    instantiateScene();
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -77,7 +108,5 @@ int main(int argc, char const *argv[])
         /* Poll for and process events */
         glfwPollEvents();
     }
-
-    glfwTerminate();
-    return 0;
+    return clear(0);
 }

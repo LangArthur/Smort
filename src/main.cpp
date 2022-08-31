@@ -18,6 +18,16 @@
 constexpr auto WINDOW_HEIGHT = 480;
 constexpr auto WINDOW_WIDTH = 640;
 
+void framebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow *window) {
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
+
 GLuint setUpShader() {
     Shader vertexShader (GL_VERTEX_SHADER, "../GLToolbox/shaders/SimpleVertexShader.vert");
     Shader fragmentShader (GL_FRAGMENT_SHADER, "../GLToolbox/shaders/SimpleFragmentShader.frag");
@@ -34,9 +44,9 @@ void instantiateScene() {
 	glBindVertexArray(VertexArrayID);
 
 	static const GLfloat g_vertex_buffer_data[] = { 
-		-1.0f, -1.0f, 0.0f,
-		 1.0f, -1.0f, 0.0f,
-		 0.0f,  1.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f,
+		 0.5f, -0.5f, 0.0f,
+		 0.0f,  0.5f, 0.0f,
 	};
 
 	GLuint vertexBuffer;
@@ -70,6 +80,7 @@ GLFWwindow* init(int argc, char **argv) {
         std::cerr << "Cannot init glew library: " << glewGetErrorString(err) << std::endl;
         return nullptr;
     }
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     return window;
     
 }
@@ -101,7 +112,7 @@ int main(int argc, char *argv[])
     {
         /* Render here */
         glClear (GL_COLOR_BUFFER_BIT);
-
+        processInput(window);
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 

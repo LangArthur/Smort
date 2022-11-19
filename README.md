@@ -7,9 +7,10 @@ libglu1-mesa-dev
 
 # Todo-list
 
-- [ ] test fly algorithm
+- [x] test fly algorithm
 - [ ] add proper doc to movement example
-- [ ] clean the example for movement
-- [ ] abstract test scene to implement examples faster
+- [x] clean the example for movement
+- [x] abstract test scene to implement examples faster
+- [ ] add speed limit to seek and fly
 
 # Ressources (for dev purpose only)

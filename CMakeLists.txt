@@ -56,6 +56,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 # movement example
 add_executable(movement-example
     ${CMAKE_CURRENT_SOURCE_DIR}/examples/movement/movement.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/examples/utils/TestScene.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/movement.cpp
 )
@@ -66,6 +67,7 @@ target_include_directories(movement-example PRIVATE
     ${GLUT_INCLUDE_DIRS}
     include/
     GLToolbox/include/
+    examples/
 )
 
 ## Linking libraries to street

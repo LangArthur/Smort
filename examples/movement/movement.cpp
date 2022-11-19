@@ -7,9 +7,6 @@
 
 #include <GL/glew.h>
 #include <GL/glut.h>
-
-#include <GLFW/glfw3.h>
-
 #include <GLFW/glfw3.h>
 #include <glm/vec4.hpp>
 #include <glm/vec3.hpp>
@@ -22,6 +19,7 @@
 #include <shader/Shader.hpp>
 #include <shader/ShaderProgram.hpp>
 
+#include "utils/TestScene.hpp"
 #include "movement/movement.hpp"
 
 struct Vertex
@@ -34,87 +32,8 @@ struct Vertex
     { }
 };
 
-struct GameObject {
-    movement::Kinetic kin;
-    glm::vec2 pos {0, 0};
-    float rotation {0.0f};
-    float speed {0.3f};
-};
-
-// global variable (to simplify example)
 constexpr auto WINDOW_HEIGHT = 480.0f;
 constexpr auto WINDOW_WIDTH = 640.0f;
-bool lineMode = false;
-
-movement::Kinetic player {
-    glm::vec3(0.0f, 0.0f, 0.0f),
-    0.0f,
-    glm::vec3(0.0f, 0.0f, 0.0f),
-    0.0f,
-};
-movement::Kinetic enemy {
-    glm::vec3(-0.8f, 0.8f, 0.0f),
-    0.0f,
-    glm::vec3(0.0f, 0.0f, 0.0f),
-    0.0f,
-};
-float maxSpeed = 1.0f;
-
-void framebufferSizeCallback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
-
-void processInput(GLFWwindow *window, movement::SteeringOutput &playerSteering)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, true);
-    }
-    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-    {
-        lineMode = !lineMode;
-        glPolygonMode(GL_FRONT_AND_BACK, lineMode ? GL_LINE : GL_FILL);
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        playerSteering.linear.y += maxSpeed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        playerSteering.linear.y -= maxSpeed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        playerSteering.linear.x -= maxSpeed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        playerSteering.linear.x += maxSpeed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-    {
-        maxSpeed += 0.01;
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-    {
-        maxSpeed -= 0.01;
-        maxSpeed = maxSpeed * (maxSpeed > 0);
-    }
-}
-
-GLuint setUpShader()
-{
-    Shader vertexShader (GL_VERTEX_SHADER, "../examples/movement/shaders/SimpleVertexShader.vert");
-    Shader fragmentShader (GL_FRAGMENT_SHADER, "../examples/movement/shaders/SimpleFragmentShader.frag");
-    ShaderProgram linker({
-        vertexShader,
-        fragmentShader,
-    });
-    return (linker.ready() ? linker.id() : 0);
-}
 
 GLuint instantiateScene()
 {
@@ -122,13 +41,6 @@ GLuint instantiateScene()
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-    // arrow object
-    // const Vertex vertices[] = {
-    //     { {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.01f} },
-    //     { {-0.05f, 0.1f, 0.0f}, {1.0f, 1.0f, 1.01f} },
-    //     { {0.2f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.01f} },
-    //     { {-0.05f, -0.1f, 0.0f}, {1.0f, 1.0f, 1.01f} },
-    // };
     const Vertex vertices[] = {
         { {0.1f, 0.1f, 0.0f}, {1.0f, 1.0f, 1.01f} },
         { {0.1f, -0.1f, 0.0f}, {1.0f, 1.0f, 1.01f} },
@@ -157,83 +69,47 @@ GLuint instantiateScene()
     return VAO;
 }
 
-GLFWwindow* init(int argc, char **argv) {
-    GLFWwindow* window;
-    // init glfw
-    if (!glfwInit())
-    {
-        std::cerr << "Failed to instantiate glfw\n";
-        return nullptr;
-    }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        std::cerr << "Error: cannot instantiate window." << std::endl;
-        return nullptr;
-    }
-
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glfwMakeContextCurrent(window);
-    // setup glew
-    GLenum err = glewInit();
-    if (err != GLEW_OK) {
-        std::cerr << "Cannot init glew library: " << glewGetErrorString(err) << std::endl;
-        return nullptr;
-    }
-    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-    return window;
-    
-}
-
-int clear(int status) {
-    glfwTerminate();
-    return status;
-}
-
 int main(int argc, char *argv[])
 {
-    GLFWwindow* window = init(argc, argv);
-    /* Create a windowed mode window and its OpenGL context */
-    if (!window)
-    {
-        return clear(1);
-    }
-    glEnable(GL_DEPTH_TEST);
+    movement::Kinetic player {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        0.0f,
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        0.0f,
+    };
+    movement::Kinetic enemy {
+        glm::vec3(-0.8f, 0.8f, 0.0f),
+        0.0f,
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        0.0f,
+    };
+    movement::SteeringOutput playerSteering {
+        {0.0f, 0.0f, 0.0f}, 0.0f,
+    };
+    movement::SteeringOutput enemySteering {
+        {0.0f, 0.0f, 0.0f}, 0.0f,
+    };
+    float maxSpeed = 1.0f;
+    bool flee = false;
 
-    GLuint shaderId = setUpShader();
-    if (shaderId == 0)
+    TestScene scene(WINDOW_WIDTH, WINDOW_HEIGHT);
+    scene.init();
+    if (!scene.setUpShader("../examples/movement/shaders/SimpleVertexShader.vert", "../examples/movement/shaders/SimpleFragmentShader.frag"))
     {
-        std::cerr << "Cannot setup shaders" << std::endl;
-        return clear(1);
+        return (1);
     }
+
     auto VAO = instantiateScene();
 
-    // time variables
-    float deltaTime = 0.0f;	// Time between current frame and last frame
-    float lastFrame = 0.0f; // Time of last frame
-
+    /* view and projection matrices */
     glm::mat4 view = glm::mat4(1.0f);
     glm::vec3 camPos = glm::vec3(0.0f, 0.0f, -3.0f);
     view = glm::translate(view, camPos);
-
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(45.0f), WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
 
-    glClearColor(0.05f, 0.05f, 0.05f, 0.05f);
-    while (!glfwWindowShouldClose(window))
-    {
-        glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
-        glUseProgram(shaderId);
-
+    scene.drawCallBack = [&](GLuint shaderId, float deltaTime){
+        glBindVertexArray(VAO);
         // draw player
         {
             glm::mat4 model = glm::mat4(1.0f);
@@ -262,30 +138,64 @@ int main(int argc, char *argv[])
             transformLoc = glGetUniformLocation(shaderId, "projection");
             glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(projection));
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        }        
+    };
+        scene.inputCallBack = [&](GLFWwindow *window){
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        {
+            playerSteering.linear.y += maxSpeed;
         }
-        glBindVertexArray(VAO);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        {
+            playerSteering.linear.y -= maxSpeed;
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        {
+            playerSteering.linear.x -= maxSpeed;
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        {
+            playerSteering.linear.x += maxSpeed;
+        }
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        {
+            maxSpeed += 0.01;
+        }
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        {
+            maxSpeed -= 0.01;
+            maxSpeed = maxSpeed * (maxSpeed > 0);
+        }
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        {
+            flee = !flee;
+        }
+    };
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
+    scene.processCallBack = [&](float deltaTime) {
         // reduce velocity of player and enemy
         player.velocity *= 0.99f;
         enemy.velocity *= 0.99f;
 
-
-        movement::SteeringOutput playerSteering {
-            {0.0f, 0.0f, 0.0f}, 0.0f,
-        };
-        movement::SteeringOutput enemySteering {
-            {0.0f, 0.0f, 0.0f}, 0.0f,
-        };
-        enemySteering = movement::seek(enemy, player.position, maxSpeed);
-        processInput(window, playerSteering);
+        if (flee)
+        {
+            enemySteering = movement::flee(enemy, player.position, maxSpeed);
+        }
+        else
+        {
+            enemySteering = movement::seek(enemy, player.position, maxSpeed);
+        }
 
         enemy.update(enemySteering, deltaTime);
         player.update(playerSteering, deltaTime);
-        /* Poll for and process events */
-        glfwPollEvents();
-    }
-    return clear(0);
+        // reset steering for next frame
+        playerSteering = {
+            {0.0f, 0.0f, 0.0f}, 0.0f,
+        };
+        enemySteering = {
+            {0.0f, 0.0f, 0.0f}, 0.0f,
+        };
+    };
+    scene.start();
+    return 0;
 }

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.13)
 set(CMAKE_CXX_STANDARD 20)
 project(test)
 
+set(CMAKE_BUILD_TYPE "Debug")
+
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLUT REQUIRED)
@@ -42,6 +44,32 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 ## Linking libraries to street
 target_link_libraries(${PROJECT_NAME} PUBLIC
+    ${OPENGL_LIBRARIES}
+    ${GLEW_LIBRARIES}
+    ${GLUT_LIBRARIES}
+    glm::glm
+    glfw
+    glut
+    GLToolBox
+)
+
+# movement example
+add_executable(movement-example
+    ${CMAKE_CURRENT_SOURCE_DIR}/examples/movement/movement.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/movement.cpp
+)
+
+target_include_directories(movement-example PRIVATE
+    ${OPENGL_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIRS}
+    ${GLUT_INCLUDE_DIRS}
+    include/
+    GLToolbox/include/
+)
+
+## Linking libraries to street
+target_link_libraries(movement-example PUBLIC
     ${OPENGL_LIBRARIES}
     ${GLEW_LIBRARIES}
     ${GLUT_LIBRARIES}

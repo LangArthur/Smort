@@ -5,8 +5,11 @@ An AI engine created to apply knowledge from the book AI for games (third Editio
 # Requirements
 libglu1-mesa-dev
 
-# Ressources (for dev purpose only)
-https://github.khronos.org
-https://github.com/KhronosGroup/OpenCL-SDK
+# Todo-list
 
-<!-- https://www.khronos.org/registry/OpenGL-Refpages/gl4/ -->
+- [ ] test fly algorithm
+- [ ] add proper doc to movement example
+- [ ] clean the example for movement
+- [ ] abstract test scene to implement examples faster
+
+# Ressources (for dev purpose only)

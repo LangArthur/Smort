@@ -10,9 +10,15 @@
 
 namespace movement
 {
-    inline float newOrientation(float current, const glm::vec3 &velocity) {
-        if (velocity.length)
-            return atan2(-velocity.x, velocity.y);
+    /**
+     * @brief give a new orientation base on the current orientation and a direction vector
+     * @param current the current orientation (in radian).
+     * @param direction direction vector
+     * @return float 
+     */
+    inline float newOrientation(float current, const glm::vec3 &direction) {
+        if (direction.length)
+            return atan2(-direction.x, direction.y);
         else
             return current;
     }

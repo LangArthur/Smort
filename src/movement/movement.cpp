@@ -5,24 +5,21 @@
  * @date 2022-06-20
  */
 
-#include <glm/geometric.hpp>
-
-#include "movement/Kinetic.hpp"
-#include "movement/utils.hpp"
+#include "movement/movement.hpp"
 
 namespace movement {
-    SteeringOutput seek(const Kinetic &currentState, const glm::vec3 &target, int maxSpeed = 1) {
+    SteeringOutput seek(const Kinetic &currentState, const glm::vec3 &target, float maxSpeed) {
         SteeringOutput result;
-        result.linear = currentState.position - target;
+        result.linear = target - currentState.position;
         glm::normalize(result.linear);
         result.linear *= maxSpeed;
         result.angular = newOrientation(currentState.orientation, result.linear);
         return result;
     }
 
-    SteeringOutput flee(const Kinetic &currentState, const glm::vec3 &target, int maxSpeed = 1) {
+    SteeringOutput flee(const Kinetic &currentState, const glm::vec3 &target, float maxSpeed) {
         SteeringOutput result;
-        result.linear = target - currentState.position;
+        result.linear = currentState.position - target;
         glm::normalize(result.linear);
         result.linear *= maxSpeed;
         result.angular = newOrientation(currentState.orientation, result.linear);

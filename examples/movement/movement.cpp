@@ -22,6 +22,8 @@
 #include <shader/Shader.hpp>
 #include <shader/ShaderProgram.hpp>
 
+#include "movement/movement.hpp"
+
 struct Vertex
 {
     glm::vec3 pos;
@@ -33,6 +35,7 @@ struct Vertex
 };
 
 struct GameObject {
+    movement::Kinetic kin;
     glm::vec2 pos {0, 0};
     float rotation {0.0f};
     float speed {0.3f};
@@ -43,8 +46,19 @@ constexpr auto WINDOW_HEIGHT = 480.0f;
 constexpr auto WINDOW_WIDTH = 640.0f;
 bool lineMode = false;
 
-GameObject player;
-GameObject enemy;
+movement::Kinetic player {
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    0.0f,
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    0.0f,
+};
+movement::Kinetic enemy {
+    glm::vec3(-0.8f, 0.8f, 0.0f),
+    0.0f,
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    0.0f,
+};
+float maxSpeed = 1.0f;
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -52,7 +66,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 }
 
 
-void processInput(GLFWwindow *window, float deltaTime)
+void processInput(GLFWwindow *window, movement::SteeringOutput &playerSteering)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
@@ -65,13 +79,30 @@ void processInput(GLFWwindow *window, float deltaTime)
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        player.pos.y += player.speed * deltaTime;
+    {
+        playerSteering.linear.y += maxSpeed;
+    }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        player.pos.y -= player.speed * deltaTime;
+    {
+        playerSteering.linear.y -= maxSpeed;
+    }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        player.pos.x -= player.speed * deltaTime;
+    {
+        playerSteering.linear.x -= maxSpeed;
+    }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        player.pos.x += player.speed * deltaTime;
+    {
+        playerSteering.linear.x += maxSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        maxSpeed += 0.01;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        maxSpeed -= 0.01;
+        maxSpeed = maxSpeed * (maxSpeed > 0);
+    }
 }
 
 GLuint setUpShader()
@@ -192,9 +223,7 @@ int main(int argc, char *argv[])
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(45.0f), WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
 
-    enemy.pos = {-0.5f, 0.5f};
-
-    glClearColor(0,1,0,0);
+    glClearColor(0.05f, 0.05f, 0.05f, 0.05f);
     while (!glfwWindowShouldClose(window))
     {
         glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -208,7 +237,7 @@ int main(int argc, char *argv[])
         // draw player
         {
             glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(player.pos, 1.0));
+            model = glm::translate(model, player.position);
             model = glm::rotate(model, glm::radians(player.rotation), glm::vec3(0.0f, 0.1f, 0.0f));
 
             unsigned int transformLoc = glGetUniformLocation(shaderId, "model");
@@ -223,7 +252,7 @@ int main(int argc, char *argv[])
         // draw enemy
         {
             glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(enemy.pos, 1.0));
+            model = glm::translate(model, enemy.position);
             model = glm::rotate(model, glm::radians(enemy.rotation), glm::vec3(0.0f, 0.1f, 0.0f));
 
             unsigned int transformLoc = glGetUniformLocation(shaderId, "model");
@@ -239,34 +268,24 @@ int main(int argc, char *argv[])
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
-        processInput(window, deltaTime);
+        // reduce velocity of player and enemy
+        player.velocity *= 0.99f;
+        enemy.velocity *= 0.99f;
+
+
+        movement::SteeringOutput playerSteering {
+            {0.0f, 0.0f, 0.0f}, 0.0f,
+        };
+        movement::SteeringOutput enemySteering {
+            {0.0f, 0.0f, 0.0f}, 0.0f,
+        };
+        enemySteering = movement::seek(enemy, player.position, maxSpeed);
+        processInput(window, playerSteering);
+
+        enemy.update(enemySteering, deltaTime);
+        player.update(playerSteering, deltaTime);
         /* Poll for and process events */
         glfwPollEvents();
     }
     return clear(0);
 }
-
-
-//         // MVP matrix
-//         glm::mat4 model = glm::mat4(1.0f);
-//         // model = glm::translate(model, cubePositions[i]);
-//         // model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3((1.5f + i * 0.3), (0.3f + i * 0.5), 0.0f));  
-
-//         unsigned int transformLoc = glGetUniformLocation(shader.id(), "model");
-//         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model));
-//         transformLoc = glGetUniformLocation(shader.id(), "view");
-//         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(view));
-//         transformLoc = glGetUniformLocation(shader.id(), "projection");
-//         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(projection));
-        
-//         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-//         /* Swap front and back buffers */
-//         glfwSwapBuffers(window);
-
-//         // processInput(window, cam, deltaTime);
-//         /* Poll for and process events */
-//         glfwPollEvents();
-//     }
-//     return clear(0);
-// }

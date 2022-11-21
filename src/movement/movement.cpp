@@ -7,9 +7,9 @@
 
 #include "movement/movement.hpp"
 
-namespace movement {
-    SteeringOutput seek(const Kinetic &currentState, const glm::vec3 &target, float maxSpeed) {
-        SteeringOutput result;
+namespace smort::movement {
+    Steering seek(const Kinetic &currentState, const glm::vec3 &target, float maxSpeed) {
+        Steering result;
         result.linear = target - currentState.position;
         glm::normalize(result.linear);
         result.linear *= maxSpeed;
@@ -17,12 +17,12 @@ namespace movement {
         return result;
     }
 
-    SteeringOutput flee(const Kinetic &currentState, const glm::vec3 &target, float maxSpeed) {
-        SteeringOutput result;
+    Steering flee(const Kinetic &currentState, const glm::vec3 &target, float maxSpeed) {
+        Steering result;
         result.linear = currentState.position - target;
         glm::normalize(result.linear);
         result.linear *= maxSpeed;
         result.angular = newOrientation(currentState.orientation, result.linear);
         return result;
     }
-}
+} // namespace smort::movement

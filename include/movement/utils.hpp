@@ -8,7 +8,7 @@
 
 #pragma once
 
-namespace movement
+namespace smort::movement
 {
     /**
      * @brief give a new orientation base on the current orientation and a direction vector
@@ -22,4 +22,4 @@ namespace movement
         else
             return current;
     }
-} // namespace movement
+} // namespace smort::movement

@@ -8,6 +8,6 @@
 #include <math.h>
 #include <glm/vec3.hpp>
 
-namespace movement
+namespace smort::movement
 {    
-} // namespace Movement
+} // namespace smort::movement

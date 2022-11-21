@@ -9,12 +9,12 @@
 
 #include <glm/vec3.hpp>
 
-namespace movement {
+namespace smort::movement {
 
     /**
      * @brief structure representing changes to be apply to a Kinetic element.
      */
-    struct SteeringOutput {
+    struct Steering {
         glm::vec3 linear; // linear change
         float angular; // angular change        
     };
@@ -24,16 +24,21 @@ namespace movement {
      */
     struct Kinetic {
         glm::vec3 position;
-        float orientation; // current orientation
-        glm::vec3 velocity;
-        float rotation; // changes applied to rotation in the next update
+        float orientation;
+        glm::vec3 velocity; // change applied to position.
+        float rotation; // changes applied to rotation.
 
-        void update(const SteeringOutput &steering, const float time = 1) {
-            position += velocity * time;
-            orientation += rotation * time;
+        /**
+         * @brief update the Kinetic with a steering.
+         * @param steering changes to be applied on the kinetic.
+         * @param deltaTime deltaTime between each update (= each rendered frame).
+         */
+        void update(const Steering &steering, const float deltaTime = 1) {
+            position += velocity * deltaTime;
+            orientation += rotation * deltaTime;
 
-            velocity += steering.linear * time;
-            rotation += steering.angular * time;
+            velocity += steering.linear * deltaTime;
+            rotation += steering.angular * deltaTime;
         }
     };
-}
+} // namespace smort::movement

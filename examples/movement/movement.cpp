@@ -71,22 +71,22 @@ GLuint instantiateScene()
 
 int main(int argc, char *argv[])
 {
-    movement::Kinetic player {
+    smort::movement::Kinetic player {
         glm::vec3(0.0f, 0.0f, 0.0f),
         0.0f,
         glm::vec3(0.0f, 0.0f, 0.0f),
         0.0f,
     };
-    movement::Kinetic enemy {
+    smort::movement::Kinetic enemy {
         glm::vec3(-0.8f, 0.8f, 0.0f),
         0.0f,
         glm::vec3(0.0f, 0.0f, 0.0f),
         0.0f,
     };
-    movement::SteeringOutput playerSteering {
+    smort::movement::Steering playerSteering {
         {0.0f, 0.0f, 0.0f}, 0.0f,
     };
-    movement::SteeringOutput enemySteering {
+    smort::movement::Steering enemySteering {
         {0.0f, 0.0f, 0.0f}, 0.0f,
     };
     float maxSpeed = 1.0f;
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         }        
     };
-        scene.inputCallBack = [&](GLFWwindow *window){
+    scene.inputCallBack = [&](GLFWwindow *window){
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
             playerSteering.linear.y += maxSpeed;
@@ -179,11 +179,11 @@ int main(int argc, char *argv[])
 
         if (flee)
         {
-            enemySteering = movement::flee(enemy, player.position, maxSpeed);
+            enemySteering = smort::movement::flee(enemy, player.position, maxSpeed);
         }
         else
         {
-            enemySteering = movement::seek(enemy, player.position, maxSpeed);
+            enemySteering = smort::movement::seek(enemy, player.position, maxSpeed);
         }
 
         enemy.update(enemySteering, deltaTime);

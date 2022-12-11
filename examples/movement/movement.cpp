@@ -83,14 +83,19 @@ int main(int argc, char *argv[])
         glm::vec3(0.0f, 0.0f, 0.0f),
         0.0f,
     };
+
     smort::movement::Steering playerSteering {
         {0.0f, 0.0f, 0.0f}, 0.0f,
     };
     smort::movement::Steering enemySteering {
         {0.0f, 0.0f, 0.0f}, 0.0f,
     };
+
+    smort::movement::Flee flee(enemy, player);
+    smort::movement::Seek seek(enemy, player);
+
     float maxSpeed = 1.0f;
-    bool flee = false;
+    bool useFlee = false;
 
     TestScene scene(WINDOW_WIDTH, WINDOW_HEIGHT);
     scene.init();
@@ -168,7 +173,7 @@ int main(int argc, char *argv[])
         }
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
         {
-            flee = !flee;
+            useFlee = !useFlee;
         }
     };
 
@@ -177,13 +182,13 @@ int main(int argc, char *argv[])
         player.velocity *= 0.99f;
         enemy.velocity *= 0.99f;
 
-        if (flee)
+        if (useFlee)
         {
-            enemySteering = smort::movement::flee(enemy, player.position, maxSpeed);
+            enemySteering = flee.getSteering();
         }
         else
         {
-            enemySteering = smort::movement::seek(enemy, player.position, maxSpeed);
+            enemySteering = seek.getSteering();
         }
 
         enemy.update(enemySteering, deltaTime);

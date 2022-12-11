@@ -93,8 +93,14 @@ int main(int argc, char *argv[])
 
     smort::movement::Flee flee(enemy, player);
     smort::movement::Seek seek(enemy, player);
+    smort::movement::Arrive arrive(enemy, player);
 
-    float maxSpeed = 1.0f;
+    float maxSpeed = 10.0f;
+    enemy.maxSpeed = maxSpeed;
+    player.maxSpeed = maxSpeed;
+    arrive.maxSpeed = maxSpeed;
+    flee.maxSpeed = maxSpeed;
+    seek.maxSpeed = maxSpeed;
     bool useFlee = false;
 
     TestScene scene(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -179,8 +185,8 @@ int main(int argc, char *argv[])
 
     scene.processCallBack = [&](float deltaTime) {
         // reduce velocity of player and enemy
-        player.velocity *= 0.99f;
-        enemy.velocity *= 0.99f;
+        player.velocity *= 0.9f;
+        enemy.velocity *= 0.9f;
 
         if (useFlee)
         {
@@ -188,7 +194,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            enemySteering = seek.getSteering();
+            enemySteering = arrive.getSteering();
         }
 
         enemy.update(enemySteering, deltaTime);

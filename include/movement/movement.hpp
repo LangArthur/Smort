@@ -7,3 +7,4 @@
 
 #include "movement/Flee.hpp"
 #include "movement/Seek.hpp"
+#include "movement/Arrive.hpp"

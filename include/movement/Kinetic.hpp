@@ -15,8 +15,8 @@ namespace smort::movement {
      * @brief structure representing changes to be apply to a Kinetic element.
      */
     struct Steering {
-        glm::vec3 linear; // linear change
-        float angular; // angular change        
+        glm::vec3 linear {0, 0, 0}; // linear change
+        float angular { 0.0f }; // angular change        
     };
 
     /**
@@ -27,6 +27,7 @@ namespace smort::movement {
         float orientation;
         glm::vec3 velocity; // change applied to position.
         float rotation; // changes applied to rotation.
+        float maxSpeed { 1.0f };
 
         /**
          * @brief update the Kinetic with a steering.
@@ -34,11 +35,14 @@ namespace smort::movement {
          * @param deltaTime deltaTime between each update (= each rendered frame).
          */
         void update(const Steering &steering, const float deltaTime = 1) {
+            velocity += steering.linear * deltaTime;
+            if (glm::length(velocity) > maxSpeed) {
+                glm::normalize(velocity);
+                velocity *= maxSpeed;
+            }
+            rotation += steering.angular * deltaTime;
             position += velocity * deltaTime;
             orientation += rotation * deltaTime;
-
-            velocity += steering.linear * deltaTime;
-            rotation += steering.angular * deltaTime;
         }
     };
 } // namespace smort::movement

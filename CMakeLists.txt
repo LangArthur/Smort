@@ -63,6 +63,7 @@ add_executable(movement-example
     ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/Flee.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/Seek.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/SteeringAlgorithm.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/movement/Arrive.cpp
 )
 
 target_include_directories(movement-example PRIVATE

@@ -24,10 +24,6 @@ namespace smort::movement {
                 m_target = target;
             }
 
-            inline void setState(const Kinetic &state) {
-                // m_state = std::make_unique<Kinetic>(&state);
-            }
-
             virtual Steering getSteering() = 0;
 
         protected:

@@ -17,7 +17,7 @@ namespace smort::movement
      * @return float 
      */
     inline float newOrientation(float current, const glm::vec3 &direction) {
-        if (direction.length)
+        if (glm::length(direction))
             return atan2(-direction.x, direction.y);
         else
             return current;
